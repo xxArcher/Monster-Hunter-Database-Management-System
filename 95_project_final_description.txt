@@ -1,0 +1,163 @@
+Monster Hunter Union Database Application
+
+
+A short description of the final project:
+
+The project we have finished is an Database Application for elders and hunters who are in a “Monster Hunter Union”. We provide different user interfaces and webpages for elders and hunters. For each of them, there are 6 different webpages, each corresponds to a table (“member” corresponds to both elders and hunters) in the database, and each user can access and edit the database through these pages.
+
+
+
+
+
+
+
+A description of changes from the original schema:
+
+1) Added “Age” attribute to both elder and hunter: we want to save the name information of clan members.
+2) Changed all “BOOLEAN” datatype to INT: BOOLEAN is not a supported datatype.
+3) Added “CreatedIn” attribute to clan: we want to know when was a clan founded.
+
+
+
+
+
+
+
+
+
+A list of all SQL queries used:
+
+ - Mission:
+
+
+INSERT INTO mission VALUES(ID,RewardPoint, Completion,TimeLimit,MinimumScore,MonsterID,ElderID);
+
+Delete From mission WHERE Completion = 1;
+Select * From mission WHERE Completion = 0;
+Select * From mission WHERE Completion = 1;
+select * from mission M WHERE NOT EXISTS (SELECT T.ID from team T WHERE NOT EXISTS(SELECT C.teamID from claims C where C.teamID=T.ID and C.missionID=M.ID))
+Update mission Set Complete = 1 Where mission.ID = “”
+Select * From mission WHERE Completion = 0;
+Select * From mission WHERE MinimumScore >= ; 
+Select * From mission WHERE  RewardPoint >= ; 
+
+
+
+
+
+
+ - Team:
+
+SELECT TeamID, teamScore AS TeamScore, MissionID, RewardPoint, Completion, TimeLimit, MinimumScore as MinimumScoreToClaim, MonsterID, ElderID FROM team JOIN claims ON team.ID = claims.TeamID JOIN mission ON claims.MissionID = mission.ID WHERE team.ID = ...;
+
+SELECT TeamID, HunterID, teamScore AS TeamScore,    NAME AS HunterName, ClanName FROM team JOIN consistsof ON team.ID = consistsof.TeamID JOIN hunter ON consistsof.HunterID = hunter.ID WHERE team.ID = ...;
+
+SELECT TeamID, COUNT(HunterID) AS Number_Of_Members FROM consistsof GROUP BY TeamID ORDER BY Number_Of_Members ASC;  
+
+SELECT MAX(TeamScore) FROM team;
+
+Update team Set teamScore = ... Where team.ID = ... ;
+
+SELECT * FROM team WHERE ID = … AND teamScore = … ;
+
+SELECT MAX(AvgAge) FROM (SELECT TeamID, AVG(Age) AS AvgAge FROM team JOIN consistsof ON team.ID = consistsof.TeamID JOIN hunter ON consistsof.HunterID = hunter.ID GROUP BY team.ID) AS myalias;
+
+INSERT INTO team VALUES(ID,0);
+
+DELETE FROM consistsof WHERE TeamID = … AND HunterID = … ;
+
+INSERT INTO claims VALUES (..., ...);
+
+SELECT TeamID, teamScore AS TeamScore, MissionID, RewardPoint, Completion, TimeLimit, MinimumScore as MinimumScoreToClaim, MonsterID, ElderID FROM team JOIN claims ON team.ID = claims.TeamID JOIN mission ON claims.MissionID = mission.ID WHERE team.ID = … AND MissionID = …;
+
+DELETE FROM team WHERE ID = … ;
+
+SELECT * FROM team WHERE ID = … ;
+
+
+
+
+
+
+ - Member:
+
+
+SELECT * FROM elder
+SELECT * FROM hunter
+SELECT * FROM elder WHERE ID = ;      or use ClanName as the constraint
+SELECT * FROM hunter WHERE ID = ;    or use ClanName as the constraint
+
+
+
+
+
+
+ - Clan:
+
+SELECT * FROM clan WHERE Name LIKE “%...%”; 
+SELECT * FROM clan 
+
+
+
+
+
+
+
+ - Monster:
+
+For elder:
+SELECT ID, Name, Location, MonsterLevel FROM monster WHERE ALIVE = 1;
+SELECT ID, Name, Location, MonsterLevel FROM monster WHERE ALIVE = 0;
+UPDATE monster SET Alive = “”  WHERE monster.ID = “ ” 
+DELETE FROM  monster WHERE monster.ID = “”;
+INSERT INTO monster VALUES(ID,Alive,MonsterLevel, Name,Location);
+
+For hunter:
+SELECT ID, Name, Location, MonsterLevel FROM monster WHERE ALIVE = 1;
+SELECT ID, Name, Location, MonsterLevel FROM monster WHERE ALIVE = 0;
+
+
+
+
+ - Equipment:
+
+1.Elder:
+SELECT * FROM equipment
+SELECT * FROM wears
+INSET INTO wears VALUES(EquipName, HunterID )
+INSERT INTO equipment VALUES(name);
+DELETE FROM wears WHERE EquipName = “ ” AND HunterID = ” ” ;
+DELETE FRO equipment WHERE equipment.Name = “”;    (on delete cascade)
+2.Hunter
+SELECT * FROM equipment;
+SELECT * FROM wears WHERE HunterID = “”;
+
+
+
+
+
+
+
+
+
+A list of all functional dependencies:
+
+Monster: ID -> ID, Alive, MonsterLevel, Name, Location (ID is the primary key, and users can use ID to determine all information about a monster)
+
+Clan: Name -> Name, Location, MemberCount, Symbol, CreatedIn (Name is the primary key, and users can use Name to determine all information about a clan)
+
+Team: ID -> ID, TeamScore (ID is the primary key, and users can use ID to determine all information about a team)
+
+Elder: ID -> ID, Name, ClanName, Age (ID is the primary key, and users can use ID to determine all information about an elder)
+
+Mission: ID -> ID, RewardPoint, Completion, TimeLimit, MinimumScore, MonsterID, ElderID (ID is the primary key, and users can use ID to determine all information about a mission)
+
+Hunter:ID -> ID, NAME, ClanName, Age (ID is the primary key, and users can use ID to determine all information about a hunter)
+
+Wear: EquipName -> EquipName, HunterID (EquipName is the primary key, and users can use EquipName to determine all information about a wear)
+
+ConsistsOf -> TeamID, HunterID -> TeamID, HunterID ((TeamID, HunterID) is the primary key and the only attributes of consistsof)
+
+Claims -> TeamID, MissionID -> TeamID, MissionID ((TeamID, MissionID) is the primary key and the only attributes of claims)
+
+Equipment -> Name -> Name (Name is the primary key and the only attributes of Equipment)
